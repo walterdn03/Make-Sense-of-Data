@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIEN.AI© — Interactive Visual Archive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .time {
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .year {
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            height: 50px;
+            border-bottom: 1px solid #333;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #fff;
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            padding: 15px 30px;
+            overflow-x: auto;
+            white-space: nowrap;
+            background: #000;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .filter-group {
+            position: relative;
+            display: inline-block;
+        }
+
+        .filter-button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 500;
+        }
+
+        .filter-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        .filter-button.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .filter-dropdown {
+            display: none;
+            position: fixed;
+            background: #000;
+            border: 1px solid #fff;
+            margin-top: 5px;
+            min-width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 300;
+        }
+
+        .filter-dropdown.active {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.2s;
+        }
+
+        .filter-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-option.selected {
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .active-filters {
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #333;
+            font-size: 11px;
+            display: none;
+        }
+
+        .active-filters.visible {
+            display: block;
+        }
+
+        .filter-tag {
+            display: inline-block;
+            background: #fff;
+            color: #000;
+            padding: 5px 10px;
+            margin: 0 5px 5px 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .filter-tag:hover {
+            background: #ddd;
+        }
+
+        .clear-filters {
+            display: inline-block;
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            margin: 0 5px 5px 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .clear-filters:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 150px;
+            height: calc(100vh - 150px);
+            display: flex;
+        }
+
+        /* World Container */
+        .world {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid #333;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .world:last-child {
+            border-right: none;
+        }
+
+        .world-label {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 10;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Sphere Container */
+        .sphere-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+        }
+
+        .sphere-inner {
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+
+        /* Image Item */
+        .sphere-item {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            background-size: cover;
+            background-position: center;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .sphere-item:hover {
+            transform: scale(1.3);
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            z-index: 100;
+        }
+
+        .sphere-item.hidden {
+            display: none;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .zoom-controls.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .zoom-controls.left {
+            left: 20px;
+        }
+
+        .zoom-controls.right {
+            right: 20px;
+        }
+
+        .zoom-slider {
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            width: 8px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .zoom-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .zoom-value {
+            font-size: 11px;
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 1px;
+            min-width: 50px;
+        }
+
+        .reset-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .reset-btn:hover {
+            background: #ddd;
+        }
+
+        /* View Controls */
+        .view-controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 90;
+        }
+
+        .view-btn {
+            padding: 12px 24px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .view-btn:hover {
+            background: #ddd;
+            transform: translateY(-2px);
+        }
+
+        .view-btn.active {
+            background: #000;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        /* Audio Controls */
+        .audio-control {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 90;
+            background: #fff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+
+        .audio-control:hover {
+            transform: scale(1.1);
+            background: #ddd;
+        }
+
+        .audio-control.muted {
+            background: #333;
+            color: #fff;
+        }
+
+        /* Comparison Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.97);
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: #000;
+            color: #fff;
+            padding: 0;
+            max-width: 1400px;
+            width: 95%;
+            margin: 50px auto;
+            border: 1px solid #fff;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            border-bottom: 1px solid #fff;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: #fff;
+            border: none;
+            color: #000;
+            font-size: 32px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            line-height: 1;
+            font-weight: 300;
+        }
+
+        .close-btn:hover {
+            background: #ddd;
+        }
+
+        /* Image Comparison */
+        .comparison-container {
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+            border-bottom: 1px solid #fff;
+        }
+
+        .comparison-side {
+            flex: 1;
+        }
+
+        .comparison-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .comparison-image {
+            width: 100%;
+            height: 400px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Metadata Grid */
+        .metadata-section {
+            padding: 30px;
+        }
+
+        .metadata-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .metadata-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .metadata-value {
+            font-size: 15px;
+            color: #fff;
+            font-weight: 400;
+        }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-container {
+                flex-direction: column;
+            }
+
+            .sphere-item {
+                width: 60px;
+                height: 60px;
+            }
+
+            .filter-bar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="top-bar">
+            <div class="logo">ALIEN.AI©</div>
+            <div class="time" id="currentTime">00:00</div>
+            <div class="year">2025</div>
+        </div>
+
+        <div class="nav-bar">
+            <div class="nav-links">
+                <a href="#home">HOME</a>
+                <a href="#explore">EXPLORE THE PROJECT</a>
+                <a href="#education">THE DATASET</a>
+            </div>
+            <div class="header-icons">
+                <button class="icon-btn" title="Expand">⛶</button>
+                <button class="icon-btn" title="Menu">☰</button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filterBar">
+            <!-- Filters will be generated here -->
+        </div>
+
+        <!-- Active Filters -->
+        <div class="active-filters" id="activeFilters">
+            <!-- Active filter tags will appear here -->
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left World (Film) -->
+        <div class="world" id="worldFilm">
+            <div class="world-label">FILM WORLD</div>
+            <div class="loading">Loading images...</div>
+            <div class="sphere-container">
+                <div class="sphere-inner" id="sphereFilm"></div>
+            </div>
+            
+            <!-- Zoom Controls Left -->
+            <div class="zoom-controls left">
+                <div class="zoom-value" id="zoomValueFilm">100%</div>
+                <input type="range" min="30" max="300" value="100" class="zoom-slider" id="zoomSliderFilm" orient="vertical">
+                <button class="reset-btn" id="resetFilm">RESET</button>
+            </div>
+        </div>
+
+        <!-- Right World (AI) -->
+        <div class="world" id="worldAI">
+            <div class="world-label">AI WORLD</div>
+            <div class="loading">Loading images...</div>
+            <div class="sphere-container">
+                <div class="sphere-inner" id="sphereAI"></div>
+            </div>
+            
+            <!-- Zoom Controls Right -->
+            <div class="zoom-controls right">
+                <div class="zoom-value" id="zoomValueAI">100%</div>
+                <input type="range" min="30" max="300" value="100" class="zoom-slider" id="zoomSliderAI" orient="vertical">
+                <button class="reset-btn" id="resetAI">RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-controls">
+        <button class="view-btn active" data-view="overview">OVERVIEW</button>
+        <button class="view-btn" data-view="scomposizione">SCOMPOSIZIONE</button>
+    </div>
+
+    <!-- Audio Control -->
+    <button class="audio-control" id="audioToggle" title="Audio will start automatically">🔊</button>
+    
+    <!-- Background Audio -->
+    <audio id="backgroundAudio" loop preload="auto">
+        <source src="assets/sound/alien.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Comparison Modal -->
+    <div class="modal" id="comparisonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Confronto</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="comparison-container">
+                <div class="comparison-side">
+                    <div class="comparison-label">Film Version</div>
+                    <div class="comparison-image" id="imageFilm"></div>
+                </div>
+                <div class="comparison-side">
+                    <div class="comparison-label">AI Version</div>
+                    <div class="comparison-image" id="imageAI"></div>
+                </div>
+            </div>
+            <div class="metadata-section">
+                <div class="metadata-title">Metadati</div>
+                <div class="metadata-grid" id="metadataContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update time (CET timezone)
+        function updateTime() {
+            const now = new Date();
+            const cetTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
+            const hours = String(cetTime.getHours()).padStart(2, '0');
+            const minutes = String(cetTime.getMinutes()).padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Audio control
+        const audio = document.getElementById('backgroundAudio');
+        const audioToggle = document.getElementById('audioToggle');
+        let isPlaying = false;
+        let audioReady = false;
+
+        // Try to start audio on first user interaction
+        function tryStartAudio() {
+            if (!audioReady) {
+                audio.volume = 0.3;
+                audio.play().then(() => {
+                    audioToggle.textContent = '🔊';
+                    audioToggle.classList.remove('muted');
+                    isPlaying = true;
+                    audioReady = true;
+                }).catch(e => {
+                    console.log('Audio autoplay blocked, waiting for user click');
+                });
+            }
+        }
+
+        // Try to start on page load
+        window.addEventListener('load', tryStartAudio);
+        
+        // Fallback: start on first click anywhere
+        document.addEventListener('click', function startOnClick() {
+            if (!audioReady) {
+                tryStartAudio();
+            }
+        }, { once: true });
+
+        audioToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioToggle.textContent = '🔇';
+                audioToggle.classList.add('muted');
+                isPlaying = false;
+            } else {
+                audio.volume = 0.3;
+                audio.play().then(() => {
+                    audioToggle.textContent = '🔊';
+                    audioToggle.classList.remove('muted');
+                    isPlaying = true;
+                    audioReady = true;
+                }).catch(e => {
+                    console.error('Audio play failed:', e);
+                    alert('Impossibile riprodurre l\'audio. Verifica che il file assets/sound/alien.mp3 esista.');
+                });
+            }
+        });
+
+        // Global data
+        let csvData = [];
+        let allSphereItems = [];
+        let activeFilters = {};
+        
+        // Rotation state for each sphere
+        let sphereRotations = {
+            film: { x: 0, y: 0, autoRotate: true },
+            ai: { x: 0, y: 0, autoRotate: true }
+        };
+        
+        // Auto-rotation animation
+        let animationFrameId;
+        
+        function animateSpheres() {
+            if (sphereRotations.film.autoRotate) {
+                sphereRotations.film.y += 0.1;
+                const sphereFilm = document.getElementById('sphereFilm');
+                if (sphereFilm) {
+                    sphereFilm.style.transform = `rotateX(${sphereRotations.film.x}deg) rotateY(${sphereRotations.film.y}deg)`;
+                }
+            }
+            
+            if (sphereRotations.ai.autoRotate) {
+                sphereRotations.ai.y += 0.1;
+                const sphereAI = document.getElementById('sphereAI');
+                if (sphereAI) {
+                    sphereAI.style.transform = `rotateX(${sphereRotations.ai.x}deg) rotateY(${sphereRotations.ai.y}deg)`;
+                }
+            }
+            
+            animationFrameId = requestAnimationFrame(animateSpheres);
+        }
+
+        // Load and parse CSV
+        async function loadCSV() {
+            try {
+                const response = await fetch('assets/alien_dataset.csv');
+                const text = await response.text();
+                parseCSV(text);
+            } catch (error) {
+                console.error('Errore nel caricamento del CSV:', error);
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            csvData = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = parseCSVLine(lines[i]);
+                const entry = {};
+                
+                headers.forEach((header, index) => {
+                    entry[header] = values[index] ? values[index].trim() : '';
+                });
+                
+                if (entry.file) {
+                    csvData.push(entry);
+                }
+            }
+            
+            console.log('CSV loaded:', csvData.length, 'entries');
+            buildFilters();
+            initializeSpheres();
+        }
+
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current);
+            
+            return values;
+        }
+
+        // Build filter system
+        function buildFilters() {
+            const filterBar = document.getElementById('filterBar');
+            
+            // Fields to filter (excluding dettagli_secondari and prompt_ai)
+            const filterFields = {
+                'forma_generale': 'Forma',
+                'numero_occhi': 'Occhi',
+                'forma_testa': 'Testa',
+                'texture_superficiale': 'Texture',
+                'numero_arti': 'Arti',
+                'dimensione_rispetto_umano': 'Dimensione',
+                'colore_dominante': 'Colore',
+                'abbigliamento': 'Abbigliamento',
+                'volto_riconoscibile': 'Volto',
+                'tono_dominante': 'Tono',
+                'genere_cinematografico': 'Genere'
+            };
+
+            Object.entries(filterFields).forEach(([field, label]) => {
+                // Get unique values
+                const uniqueValues = [...new Set(csvData
+                    .map(d => d[field])
+                    .filter(v => v && v !== 'sconosciuto')
+                )].sort();
+
+                if (uniqueValues.length === 0) return;
+
+                const filterGroup = document.createElement('div');
+                filterGroup.className = 'filter-group';
+
+                const button = document.createElement('button');
+                button.className = 'filter-button';
+                button.textContent = label;
+                button.dataset.field = field;
+
+                const dropdown = document.createElement('div');
+                dropdown.className = 'filter-dropdown';
+
+                uniqueValues.forEach(value => {
+                    const option = document.createElement('div');
+                    option.className = 'filter-option';
+                    option.textContent = value;
+                    option.dataset.value = value;
+                    option.dataset.field = field;
+                    
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleFilter(field, value, option);
+                    });
+
+                    dropdown.appendChild(option);
+                });
+
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Close other dropdowns
+                    document.querySelectorAll('.filter-dropdown').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('active');
+                    });
+                    
+                    // Position dropdown below button
+                    const rect = button.getBoundingClientRect();
+                    dropdown.style.left = rect.left + 'px';
+                    dropdown.style.top = rect.bottom + 5 + 'px';
+                    
+                    dropdown.classList.toggle('active');
+                });
+
+                filterGroup.appendChild(button);
+                filterGroup.appendChild(dropdown);
+                filterBar.appendChild(filterGroup);
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.filter-dropdown').forEach(d => {
+                    d.classList.remove('active');
+                });
+            });
+        }
+
+        // Toggle filter
+        function toggleFilter(field, value, optionElement) {
+            if (!activeFilters[field]) {
+                activeFilters[field] = [];
+            }
+
+            const index = activeFilters[field].indexOf(value);
+            if (index > -1) {
+                activeFilters[field].splice(index, 1);
+                optionElement.classList.remove('selected');
+                if (activeFilters[field].length === 0) {
+                    delete activeFilters[field];
+                }
+            } else {
+                activeFilters[field].push(value);
+                optionElement.classList.add('selected');
+            }
+
+            updateActiveFilterTags();
+            applyFilters();
+        }
+
+        // Update active filter tags
+        function updateActiveFilterTags() {
+            const activeFiltersDiv = document.getElementById('activeFilters');
+            activeFiltersDiv.innerHTML = '';
+
+            const hasFilters = Object.keys(activeFilters).length > 0;
+            activeFiltersDiv.classList.toggle('visible', hasFilters);
+
+            if (hasFilters) {
+                // Clear all button
+                const clearBtn = document.createElement('button');
+                clearBtn.className = 'clear-filters';
+                clearBtn.textContent = '✕ Clear All';
+                clearBtn.addEventListener('click', clearAllFilters);
+                activeFiltersDiv.appendChild(clearBtn);
+
+                // Filter tags
+                Object.entries(activeFilters).forEach(([field, values]) => {
+                    values.forEach(value => {
+                        const tag = document.createElement('span');
+                        tag.className = 'filter-tag';
+                        tag.textContent = `${value} ✕`;
+                        tag.addEventListener('click', () => {
+                            const option = document.querySelector(`.filter-option[data-field="${field}"][data-value="${value}"]`);
+                            if (option) toggleFilter(field, value, option);
+                        });
+                        activeFiltersDiv.appendChild(tag);
+                    });
+                });
+            }
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            activeFilters = {};
+            document.querySelectorAll('.filter-option.selected').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            updateActiveFilterTags();
+            applyFilters();
+        }
+
+        // Apply filters to spheres
+        function applyFilters() {
+            const hasFilters = Object.keys(activeFilters).length > 0;
+
+            allSphereItems.forEach(item => {
+                const filename = item.dataset.filename;
+                const data = csvData.find(d => d.file === filename);
+
+                if (!data) {
+                    item.classList.add('hidden');
+                    return;
+                }
+
+                let shouldShow = true;
+
+                if (hasFilters) {
+                    for (const [field, values] of Object.entries(activeFilters)) {
+                        const itemValue = data[field];
+                        if (!values.includes(itemValue)) {
+                            shouldShow = false;
+                            break;
+                        }
+                    }
+                }
+
+                item.classList.toggle('hidden', !shouldShow);
+            });
+        }
+
+        // Generate spherical distribution
+        function generateSpherePositions(count, radius = 250) {
+            const positions = [];
+            const phi = Math.PI * (3 - Math.sqrt(5));
+            
+            for (let i = 0; i < count; i++) {
+                const y = 1 - (i / (count - 1)) * 2;
+                const radiusAtY = Math.sqrt(1 - y * y) * radius;
+                const theta = phi * i;
+                
+                const x = Math.cos(theta) * radiusAtY;
+                const z = Math.sin(theta) * radiusAtY;
+                
+                positions.push({ x, y: y * radius, z });
+            }
+            
+            return positions;
+        }
+
+        // Initialize spheres with images
+        function initializeSpheres() {
+            const sphereFilm = document.getElementById('sphereFilm');
+            const sphereAI = document.getElementById('sphereAI');
+            
+            document.querySelectorAll('.loading').forEach(el => el.remove());
+            
+            const positions = generateSpherePositions(csvData.length);
+            allSphereItems = [];
+            
+            csvData.forEach((data, index) => {
+                const filename = data.file;
+                const pos = positions[index];
+                
+                // Film sphere item
+                const itemFilm = document.createElement('div');
+                itemFilm.className = 'sphere-item';
+                itemFilm.style.transform = `translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px)`;
+                itemFilm.style.backgroundImage = `url('assets/image/immagini_film/${filename}')`;
+                itemFilm.dataset.filename = filename;
+                itemFilm.dataset.index = index;
+                itemFilm.addEventListener('click', () => showComparison(filename));
+                sphereFilm.appendChild(itemFilm);
+                allSphereItems.push(itemFilm);
+                
+                // AI sphere item
+                const itemAI = document.createElement('div');
+                itemAI.className = 'sphere-item';
+                itemAI.style.transform = `translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px)`;
+                itemAI.style.backgroundImage = `url('assets/image/immagini_ai/${filename}')`;
+                itemAI.dataset.filename = filename;
+                itemAI.dataset.index = index;
+                itemAI.addEventListener('click', () => showComparison(filename));
+                sphereAI.appendChild(itemAI);
+                allSphereItems.push(itemAI);
+            });
+            
+            console.log('Spheres initialized with', csvData.length, 'images');
+            
+            initSphereNavigation('worldFilm', 'sphereFilm', 'film');
+            initSphereNavigation('worldAI', 'sphereAI', 'ai');
+            
+            animateSpheres();
+        }
+
+        // Initialize interactive sphere navigation
+        function initSphereNavigation(worldId, sphereId, rotationKey) {
+            const world = document.getElementById(worldId);
+            const sphere = document.getElementById(sphereId);
+            
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let currentRotation = sphereRotations[rotationKey];
+            let currentScale = 1;
+            
+            const zoomSlider = document.getElementById(`zoomSlider${rotationKey === 'film' ? 'Film' : 'AI'}`);
+            const zoomValue = document.getElementById(`zoomValue${rotationKey === 'film' ? 'Film' : 'AI'}`);
+            const resetBtn = document.getElementById(`reset${rotationKey === 'film' ? 'Film' : 'AI'}`);
+            const zoomControls = zoomSlider.closest('.zoom-controls');
+            
+            world.addEventListener('mousemove', (e) => {
+                const rect = world.getBoundingClientRect();
+                const distanceFromEdge = rotationKey === 'film' 
+                    ? e.clientX - rect.left 
+                    : rect.right - e.clientX;
+                
+                if (distanceFromEdge < 150) {
+                    zoomControls.classList.add('visible');
+                } else {
+                    zoomControls.classList.remove('visible');
+                }
+            });
+            
+            world.addEventListener('mouseleave', () => {
+                zoomControls.classList.remove('visible');
+            });
+            
+            zoomControls.addEventListener('mouseenter', () => {
+                zoomControls.classList.add('visible');
+            });
+            
+            zoomSlider.addEventListener('input', (e) => {
+                currentScale = e.target.value / 100;
+                sphere.style.scale = currentScale;
+                zoomValue.textContent = `${e.target.value}%`;
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                currentRotation.x = 0;
+                currentRotation.y = 0;
+                currentRotation.autoRotate = true;
+                currentScale = 1;
+                sphere.style.scale = 1;
+                zoomSlider.value = 100;
+                zoomValue.textContent = '100%';
+            });
+            
+            world.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.zoom-controls')) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                world.style.cursor = 'grabbing';
+                currentRotation.autoRotate = false;
+            });
+            
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                currentRotation.y += deltaX * 0.5;
+                currentRotation.x -= deltaY * 0.5;
+                
+                sphere.style.transform = `rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
+                
+                startX = e.clientX;
+                startY = e.clientY;
+            });
+            
+            window.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    world.style.cursor = 'grab';
+                    
+                    setTimeout(() => {
+                        currentRotation.autoRotate = true;
+                    }, 3000);
+                }
+            });
+            
+            world.style.cursor = 'grab';
+            
+            world.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -10 : 10;
+                const newValue = Math.max(30, Math.min(300, parseInt(zoomSlider.value) + delta));
+                zoomSlider.value = newValue;
+                currentScale = newValue / 100;
+                sphere.style.scale = currentScale;
+                zoomValue.textContent = `${newValue}%`;
+            }, { passive: false });
+        }
+
+        // Show comparison modal
+        function showComparison(filename) {
+            const metadata = csvData.find(d => d.file === filename);
+            
+            if (!metadata) {
+                console.error('Metadata not found for:', filename);
+                return;
+            }
+            
+            document.getElementById('modalTitle').textContent = metadata.titolo_film || 'Confronto';
+            
+            document.getElementById('imageFilm').style.backgroundImage = 
+                `url('assets/image/immagini_film/${filename}')`;
+            document.getElementById('imageAI').style.backgroundImage = 
+                `url('assets/image/immagini_ai/${filename}')`;
+            
+            const metadataContent = document.getElementById('metadataContent');
+            let html = '';
+            
+            const fields = {
+                'titolo_film': 'Titolo Film',
+                'anno_film': 'Anno',
+                'genere_cinematografico': 'Genere',
+                'forma_generale': 'Forma Generale',
+                'numero_occhi': 'Numero Occhi',
+                'forma_testa': 'Forma Testa',
+                'texture_superficiale': 'Texture',
+                'numero_arti': 'Numero Arti',
+                'dimensione_rispetto_umano': 'Dimensione',
+                'colore_dominante': 'Colore Dominante',
+                'abbigliamento': 'Abbigliamento',
+                'volto_riconoscibile': 'Volto Riconoscibile',
+                'tono_dominante': 'Tono',
+                'dettagli_secondari': 'Dettagli Secondari',
+                'prompt_ai': 'Prompt AI'
+            };
+            
+            for (const [key, label] of Object.entries(fields)) {
+                if (metadata[key] && metadata[key] !== 'sconosciuto') {
+                    html += `
+                        <div class="metadata-item">
+                            <div class="metadata-label">${label}</div>
+                            <div class="metadata-value">${metadata[key]}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            metadataContent.innerHTML = html;
+            document.getElementById('comparisonModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('comparisonModal').classList.remove('active');
+        }
+
+        document.getElementById('comparisonModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // View mode controls
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const view = this.getAttribute('data-view');
+                if (view === 'scomposizione') {
+                    // Scomposizione mode - to be implemented
+                    console.log('Switching to Scomposizione mode...');
+                }
+            });
+        });
+
+        // Initialize
+        loadCSV();
+    </script>
+</body>
+</html>
