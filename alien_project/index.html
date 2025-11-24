@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIEN.AI© — Interactive Visual Archive</title>
+    <title>ALIEN.AI</title>
     <style>
         * {
             margin: 0;
@@ -239,6 +239,608 @@
             display: flex;
         }
 
+        /* Scomposizione Mode Switch */
+        .scomp-mode-switch {
+            position: fixed;
+            top: 170px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 0;
+            background: #000;
+            border: 1px solid #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 200;
+        }
+
+        .scomp-mode-switch.active {
+            display: flex;
+        }
+
+        .scomp-switch-btn {
+            padding: 8px 20px;
+            background: transparent;
+            color: #fff;
+            border: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .scomp-switch-btn:first-child {
+            border-right: 1px solid #fff;
+        }
+
+        .scomp-switch-btn.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .scomp-switch-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Grid View Mode */
+        .grid-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .grid-view.active {
+            display: block;
+        }
+
+        .grid-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .grid-row {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .grid-row:last-child {
+            border-bottom: none;
+        }
+
+        .grid-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            margin: 0 -10px 25px -10px;
+        }
+
+        .grid-row.row-highlighted {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            margin: 0 -10px 25px -10px;
+        }
+
+        .grid-row:hover .grid-category-label,
+        .grid-row.row-highlighted .grid-category-label {
+            color: #fff;
+        }
+
+        .grid-row:hover .grid-image,
+        .grid-row.row-highlighted .grid-image {
+            opacity: 1;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .grid-category-label {
+            width: 100px;
+            flex-shrink: 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            padding-top: 5px;
+            transition: color 0.3s;
+        }
+
+        .grid-images {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .grid-image {
+            width: 40px;
+            height: 40px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            opacity: 0.8;
+        }
+
+        .grid-image:hover {
+            transform: scale(1.5);
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            z-index: 10;
+        }
+
+        .grid-count {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        /* Collage View (existing anatomical) */
+        .collage-view {
+            display: block;
+        }
+
+        .collage-view.active {
+            display: block;
+        }
+
+        .collage-view:not(.active) {
+            display: none;
+        }
+
+        /* Scomposizione Mode */
+        .scomposizione-view {
+            display: none;
+            flex-direction: row;
+        }
+
+        .scomposizione-view.active {
+            display: flex;
+        }
+
+        .scomposizione-side {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid #333;
+            overflow: hidden;
+            padding: 60px 20px 20px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .scomposizione-side:last-child {
+            border-right: none;
+        }
+
+        .scomposizione-label {
+            position: fixed;
+            top: 170px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            left: 25%;
+            transform: translateX(-50%);
+        }
+
+        .scomposizione-side:last-child .scomposizione-label {
+            left: 75%;
+        }
+
+        .anatomical-structure {
+            position: relative;
+            width: 600px;
+            height: 750px;
+            margin: 0 auto;
+        }
+
+        /* Anatomical zones - FIXED SIZES */
+        .anatomy-zone {
+            position: absolute;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .zone-head {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 180px;
+        }
+
+        .zone-eyes {
+            display: none;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 70px;
+        }
+
+        .zone-chest {
+            top: 270px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 230px;
+            height: 270px;
+        }
+
+        .zone-arms-left {
+            top: 230px;
+            left: 30px;
+            width: 100px;
+            height: 180px;
+        }
+
+        .zone-arms-right {
+            top: 230px;
+            right: 30px;
+            width: 100px;
+            height: 180px;
+        }
+
+        .zone-hand-left {
+            top: 420px;
+            left: 20px;
+            width: 80px;
+            height: 110px;
+        }
+
+        .zone-hand-right {
+            top: 420px;
+            right: 20px;
+            width: 80px;
+            height: 110px;
+        }
+
+        .zone-foot-left {
+            top: 610px;
+            left: 50%;
+            transform: translateX(-100%);
+            width: 100px;
+            height: 140px;
+            margin-left: -10px;
+        }
+
+        .zone-foot-right {
+            top: 610px;
+            left: 50%;
+            transform: translateX(0%);
+            width: 100px;
+            height: 140px;
+            margin-left: 10px;
+        }
+
+        .zone-label {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .zone-count {
+            position: absolute;
+            top: -22px;
+            right: -5px;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 700;
+            z-index: 1000;
+        }
+
+        /* Overlapping images effect - SMALLER SIZE */
+        .anatomy-part-img {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.3s;
+            pointer-events: all;
+        }
+
+        .anatomy-part-img:hover {
+            opacity: 1;
+            transform: scale(1.5) !important;
+            z-index: 999 !important;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+        }
+
+        /* Zone container for overlapping */
+        .zone-stack {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Highlight effect for zones */
+        .anatomy-zone.highlighted {
+            animation: zoneGlow 0.6s ease-in-out;
+        }
+
+        @keyframes zoneGlow {
+            0%, 100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.8) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+            }
+        }
+
+        .anatomy-zone.highlighted .anatomy-part-img {
+            opacity: 1;
+        }
+
+        /* Body silhouette guide (optional) */
+        .body-silhouette {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 900px;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .anatomy-zone {
+            z-index: 1;
+        }
+
+        /* Overview Mode */
+        .overview-view {
+            display: flex;
+        }
+
+        .overview-view.active {
+            display: flex;
+        }
+
+        .overview-view:not(.active) {
+            display: none;
+        }
+
+        /* Overview mode */
+        .main-container.overview-mode .world {
+            display: flex;
+        }
+
+        .main-container.overview-mode .composition-world {
+            display: none;
+        }
+
+        /* Scomposizione mode */
+        .main-container.scomposizione-mode .world {
+            display: none;
+        }
+
+        .main-container.scomposizione-mode .composition-world {
+            display: flex;
+        }
+
+        /* Composition World */
+        .composition-world {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid #333;
+            overflow: hidden;
+            display: none;
+        }
+
+        .composition-world:last-child {
+            border-right: none;
+        }
+
+        .composition-label {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 10;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 500px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Parts Palette */
+        .parts-palette {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #fff;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .palette-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            background: #000;
+        }
+
+        .palette-tab {
+            padding: 10px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            cursor: pointer;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background 0.3s;
+        }
+
+        .palette-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .palette-tab.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .palette-content {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            height: calc(100% - 41px);
+            overflow-x: auto;
+        }
+
+        .part-item {
+            min-width: 100px;
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .part-item:hover {
+            border-color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .part-item.selected {
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        /* Placed Part */
+        .placed-part {
+            position: absolute;
+            cursor: move;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: border-color 0.3s;
+        }
+
+        .placed-part:hover {
+            border-color: #fff;
+        }
+
+        .placed-part.selected {
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        .part-controls {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            display: none;
+            gap: 5px;
+        }
+
+        .placed-part:hover .part-controls,
+        .placed-part.selected .part-controls {
+            display: flex;
+        }
+
+        .part-control-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            width: 25px;
+            height: 25px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .part-control-btn:hover {
+            background: #ddd;
+        }
+
+        /* Composition Controls */
+        .composition-controls {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .comp-control-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .comp-control-btn:hover {
+            background: #ddd;
+        }
+
         /* World Container */
         .world {
             flex: 1;
@@ -407,9 +1009,9 @@
 
         .view-btn {
             padding: 12px 24px;
-            background: #fff;
-            color: #000;
-            border: none;
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
             border-radius: 25px;
             font-size: 12px;
             text-transform: uppercase;
@@ -424,13 +1026,13 @@
         }
 
         .view-btn:hover {
-            background: #ddd;
+            background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
         }
 
         .view-btn.active {
-            background: #000;
-            color: #fff;
+            background: #fff;
+            color: #000;
             border: 1px solid #fff;
         }
 
@@ -648,7 +1250,7 @@
     <!-- Header -->
     <div class="header">
         <div class="top-bar">
-            <div class="logo">ALIEN.AI©</div>
+            <div class="logo">ALIEN.AI</div>
             <div class="time" id="currentTime">00:00</div>
             <div class="year">2025</div>
         </div>
@@ -656,13 +1258,13 @@
         <div class="nav-bar">
             <div class="nav-links">
                 <a href="#home">HOME</a>
-                <a href="#explore">EXPLORE THE PROJECT</a>
+                <a href="#explore">PROJECT</a>
                 <a href="#education">THE DATASET</a>
             </div>
-            <div class="header-icons">
+            <!--<div class="header-icons">
                 <button class="icon-btn" title="Expand">⛶</button>
                 <button class="icon-btn" title="Menu">☰</button>
-            </div>
+            </div>-->
         </div>
 
         <!-- Filter Bar -->
@@ -677,8 +1279,8 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-container">
-        <!-- Left World (Film) -->
+    <div class="main-container overview-mode">
+        <!-- Overview Mode: Left World (Film) -->
         <div class="world" id="worldFilm">
             <div class="world-label">FILM WORLD</div>
             <div class="loading">Loading images...</div>
@@ -694,7 +1296,7 @@
             </div>
         </div>
 
-        <!-- Right World (AI) -->
+        <!-- Overview Mode: Right World (AI) -->
         <div class="world" id="worldAI">
             <div class="world-label">AI WORLD</div>
             <div class="loading">Loading images...</div>
@@ -709,12 +1311,74 @@
                 <button class="reset-btn" id="resetAI">RESET</button>
             </div>
         </div>
+
+        <!-- Scomposizione Mode: Left Composition (Film) -->
+        <div class="composition-world" id="compositionFilm">
+            <div class="composition-label">FILM COMPOSITION</div>
+            
+            <div class="composition-controls">
+                <button class="comp-control-btn" id="clearFilm">CLEAR ALL</button>
+                <button class="comp-control-btn" id="exportFilm">EXPORT</button>
+            </div>
+
+            <div class="canvas-area" id="canvasFilm">
+                <!-- Placed parts will go here -->
+            </div>
+
+            <div class="parts-palette">
+                <div class="palette-tabs" id="paletteTabsFilm">
+                    <div class="palette-tab active" data-category="head" data-world="film">HEAD</div>
+                    <div class="palette-tab" data-category="eyes" data-world="film">EYES</div>
+                    <div class="palette-tab" data-category="chest" data-world="film">CHEST</div>
+                    <div class="palette-tab" data-category="arms" data-world="film">ARMS</div>
+                    <div class="palette-tab" data-category="hand" data-world="film">HANDS</div>
+                    <div class="palette-tab" data-category="foot" data-world="film">FEET</div>
+                </div>
+                <div class="palette-content" id="paletteContentFilm">
+                    <!-- Parts will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Scomposizione Mode: Right Composition (AI) -->
+        <div class="composition-world" id="compositionAI">
+            <div class="composition-label">AI COMPOSITION</div>
+            
+            <div class="composition-controls">
+                <button class="comp-control-btn" id="clearAI">CLEAR ALL</button>
+                <button class="comp-control-btn" id="exportAI">EXPORT</button>
+            </div>
+
+            <div class="canvas-area" id="canvasAI">
+                <!-- Placed parts will go here -->
+            </div>
+
+            <div class="parts-palette">
+                <div class="palette-tabs" id="paletteTabsAI">
+                    <div class="palette-tab active" data-category="head" data-world="ai">HEAD</div>
+                    <div class="palette-tab" data-category="eyes" data-world="ai">EYES</div>
+                    <div class="palette-tab" data-category="chest" data-world="ai">CHEST</div>
+                    <div class="palette-tab" data-category="arms" data-world="ai">ARMS</div>
+                    <div class="palette-tab" data-category="hand" data-world="ai">HANDS</div>
+                    <div class="palette-tab" data-category="foot" data-world="ai">FEET</div>
+                </div>
+                <div class="palette-content" id="paletteContentAI">
+                    <!-- Parts will be loaded here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- View Controls -->
     <div class="view-controls">
         <button class="view-btn active" data-view="overview">OVERVIEW</button>
-        <button class="view-btn" data-view="scomposizione">SCOMPOSIZIONE</button>
+        <button class="view-btn" data-view="scomposizione">DECOMPOSITION</button>
+    </div>
+
+    <!-- Scomposizione Mode Switch -->
+    <div class="scomp-mode-switch" id="scompSwitch">
+        <button class="scomp-switch-btn active" data-mode="collage">BODY</button>
+        <button class="scomp-switch-btn" data-mode="grid">GRID</button>
     </div>
 
     <!-- Audio Control -->
@@ -1278,7 +1942,6 @@
                 'abbigliamento': 'Abbigliamento',
                 'volto_riconoscibile': 'Volto Riconoscibile',
                 'tono_dominante': 'Tono',
-                'dettagli_secondari': 'Dettagli Secondari',
                 'prompt_ai': 'Prompt AI'
             };
             
@@ -1320,15 +1983,720 @@
                 this.classList.add('active');
                 
                 const view = this.getAttribute('data-view');
+                const mainContainer = document.querySelector('.main-container');
+                const scompSwitch = document.getElementById('scompSwitch');
+                
                 if (view === 'scomposizione') {
-                    // Scomposizione mode - to be implemented
-                    console.log('Switching to Scomposizione mode...');
+                    mainContainer.classList.remove('overview-mode');
+                    mainContainer.classList.add('scomposizione-mode');
+                    
+                    // Show scomposizione mode switch
+                    scompSwitch.classList.add('active');
+                    
+                    // Hide overview worlds
+                    document.querySelectorAll('.world').forEach(w => w.style.display = 'none');
+                    document.querySelectorAll('.composition-world').forEach(w => w.style.display = 'none');
+                    
+                    // Show/create anatomical view
+                    if (!document.querySelector('.scomposizione-container')) {
+                        createAnatomicalView();
+                    } else {
+                        document.querySelector('.scomposizione-container').style.display = 'flex';
+                    }
+                    
+                    if (!anatomicalPartsLoaded) {
+                        loadAnatomicalParts();
+                    }
+                } else {
+                    mainContainer.classList.remove('scomposizione-mode');
+                    mainContainer.classList.add('overview-mode');
+                    
+                    // Hide scomposizione mode switch
+                    scompSwitch.classList.remove('active');
+                    
+                    // Show overview worlds
+                    document.querySelectorAll('.world').forEach(w => w.style.display = 'block');
+                    
+                    // Hide scomposizione
+                    const scomp = document.querySelector('.scomposizione-container');
+                    if (scomp) scomp.style.display = 'none';
                 }
             });
+        });
+
+        // Scomposizione mode switch handler (collage vs grid)
+        document.querySelectorAll('.scomp-switch-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mode = this.getAttribute('data-mode');
+                
+                // Update button states
+                document.querySelectorAll('.scomp-switch-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Toggle views
+                if (mode === 'collage') {
+                    document.querySelectorAll('.collage-view').forEach(v => v.classList.add('active'));
+                    document.querySelectorAll('.grid-view').forEach(v => v.classList.remove('active'));
+                } else {
+                    document.querySelectorAll('.collage-view').forEach(v => v.classList.remove('active'));
+                    document.querySelectorAll('.grid-view').forEach(v => v.classList.add('active'));
+                }
+            });
+        });
+
+        // Anatomical automatic display
+        let anatomicalPartsLoaded = false;
+        let anatomicalParts = {
+            film: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] },
+            ai: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] }
+        };
+
+        function createAnatomicalView() {
+            const mainContainer = document.querySelector('.main-container');
+            
+            const scompContainer = document.createElement('div');
+            scompContainer.className = 'scomposizione-container';
+            scompContainer.style.cssText = 'display: flex; width: 100%; height: 100%;';
+            
+            // Film side
+            const filmSide = document.createElement('div');
+            filmSide.className = 'scomposizione-side';
+            filmSide.innerHTML = `
+                <div class="scomposizione-label">FILM PARTS</div>
+                
+                <!-- Collage View (Anatomical) -->
+                <div class="collage-view active">
+                    <div class="anatomical-body" id="filmAnatomical">
+                        <div class="loading" style="position: static; transform: none; padding: 100px 0; text-align: center;">Loading parts...</div>
+                    </div>
+                </div>
+                
+                <!-- Grid View -->
+                <div class="grid-view" id="filmGrid">
+                    <div class="grid-container">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            `;
+            
+            // AI side
+            const aiSide = document.createElement('div');
+            aiSide.className = 'scomposizione-side';
+            aiSide.innerHTML = `
+                <div class="scomposizione-label">AI PARTS</div>
+                
+                <!-- Collage View (Anatomical) -->
+                <div class="collage-view active">
+                    <div class="anatomical-body" id="aiAnatomical">
+                        <div class="loading" style="position: static; transform: none; padding: 100px 0; text-align: center;">Loading parts...</div>
+                    </div>
+                </div>
+                
+                <!-- Grid View -->
+                <div class="grid-view" id="aiGrid">
+                    <div class="grid-container">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            `;
+            
+            scompContainer.appendChild(filmSide);
+            scompContainer.appendChild(aiSide);
+            mainContainer.appendChild(scompContainer);
+        }
+
+        async function loadAnatomicalParts() {
+            anatomicalPartsLoaded = true;
+            
+            // Try to load manifest
+            try {
+                const response = await fetch('assets/parts_manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    anatomicalParts = processManifest(manifest);
+                } else {
+                    // Fallback: scan using CSV names
+                    await scanPartsFromCSV();
+                }
+            } catch (e) {
+                console.log('Manifest not found, scanning from CSV...');
+                await scanPartsFromCSV();
+            }
+            
+            renderAnatomicalBody('film');
+            renderAnatomicalBody('ai');
+            
+            // Also render grid views
+            renderGridView('film');
+            renderGridView('ai');
+        }
+
+        function renderGridView(type) {
+            const container = document.querySelector(`#${type}Grid .grid-container`);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const categoryOrder = [
+                { key: 'head', label: 'HEAD' },
+                { key: 'chest', label: 'CHEST' },
+                { key: 'arms', label: 'ARMS' },
+                { key: 'hand', label: 'HANDS' },
+                { key: 'foot', label: 'FEET' }
+            ];
+            
+            categoryOrder.forEach(({ key, label }) => {
+                const parts = anatomicalParts[type][key] || [];
+                
+                const row = document.createElement('div');
+                row.className = 'grid-row';
+                row.dataset.category = key;
+                
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'grid-category-label';
+                labelDiv.innerHTML = `
+                    ${label}
+                    <div class="grid-count">${parts.length} part${parts.length !== 1 ? 's' : ''}</div>
+                `;
+                
+                const imagesDiv = document.createElement('div');
+                imagesDiv.className = 'grid-images';
+                
+                parts.forEach(part => {
+                    const img = document.createElement('div');
+                    img.className = 'grid-image';
+                    img.style.backgroundImage = `url('${part.path}')`;
+                    img.title = part.name;
+                    imagesDiv.appendChild(img);
+                });
+                
+                // Add hover effect to highlight corresponding anatomical zones AND grid rows
+                row.addEventListener('mouseenter', function() {
+                    highlightAnatomicalZone(key, type);
+                    highlightCorrespondingGridRow(key);
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    unhighlightAnatomicalZone(key, type);
+                    unhighlightCorrespondingGridRow(key);
+                });
+                
+                row.appendChild(labelDiv);
+                row.appendChild(imagesDiv);
+                container.appendChild(row);
+            });
+        }
+
+        function highlightAnatomicalZone(category, type) {
+            // Highlight in BOTH film and AI anatomical bodies
+            const filmBody = document.getElementById('filmAnatomical');
+            const aiBody = document.getElementById('aiAnatomical');
+            
+            // Find all zones for this category
+            let zoneSelectors = [];
+            if (category === 'arms') {
+                zoneSelectors = ['.zone-arms-left', '.zone-arms-right'];
+            } else if (category === 'hand') {
+                zoneSelectors = ['.zone-hand-left', '.zone-hand-right'];
+            } else if (category === 'foot') {
+                zoneSelectors = ['.zone-foot-left', '.zone-foot-right'];
+            } else {
+                zoneSelectors = [`.zone-${category}`];
+            }
+            
+            // Apply to both film and AI
+            [filmBody, aiBody].forEach(body => {
+                if (!body) return;
+                zoneSelectors.forEach(selector => {
+                    const zone = body.querySelector(selector);
+                    if (zone) zone.classList.add('highlighted');
+                });
+            });
+        }
+
+        function unhighlightAnatomicalZone(category, type) {
+            // Unhighlight in BOTH film and AI anatomical bodies
+            const filmBody = document.getElementById('filmAnatomical');
+            const aiBody = document.getElementById('aiAnatomical');
+            
+            // Find all zones for this category
+            let zoneSelectors = [];
+            if (category === 'arms') {
+                zoneSelectors = ['.zone-arms-left', '.zone-arms-right'];
+            } else if (category === 'hand') {
+                zoneSelectors = ['.zone-hand-left', '.zone-hand-right'];
+            } else if (category === 'foot') {
+                zoneSelectors = ['.zone-foot-left', '.zone-foot-right'];
+            } else {
+                zoneSelectors = [`.zone-${category}`];
+            }
+            
+            // Remove from both film and AI
+            [filmBody, aiBody].forEach(body => {
+                if (!body) return;
+                zoneSelectors.forEach(selector => {
+                    const zone = body.querySelector(selector);
+                    if (zone) zone.classList.remove('highlighted');
+                });
+            });
+        }
+
+        function highlightCorrespondingGridRow(category) {
+            // Highlight the same category row in BOTH film and AI grids
+            const filmGrid = document.querySelector('#filmGrid');
+            const aiGrid = document.querySelector('#aiGrid');
+            
+            [filmGrid, aiGrid].forEach(grid => {
+                if (!grid) return;
+                const row = grid.querySelector(`.grid-row[data-category="${category}"]`);
+                if (row) {
+                    row.classList.add('row-highlighted');
+                }
+            });
+        }
+
+        function unhighlightCorrespondingGridRow(category) {
+            // Unhighlight the same category row in BOTH film and AI grids
+            const filmGrid = document.querySelector('#filmGrid');
+            const aiGrid = document.querySelector('#aiGrid');
+            
+            [filmGrid, aiGrid].forEach(grid => {
+                if (!grid) return;
+                const row = grid.querySelector(`.grid-row[data-category="${category}"]`);
+                if (row) {
+                    row.classList.remove('row-highlighted');
+                }
+            });
+        }
+
+        function processManifest(manifest) {
+            const processed = {
+                film: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] },
+                ai: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] }
+            };
+            
+            ['film', 'ai'].forEach(type => {
+                const baseDir = type === 'film' ? 'parti_estratte_film' : 'parti_estratte_ai';
+                ['head', 'eyes', 'chest', 'arms', 'hand', 'foot'].forEach(category => {
+                    if (manifest[type] && manifest[type][category]) {
+                        processed[type][category] = manifest[type][category].map(filename => ({
+                            path: `assets/image/${baseDir}/${category}/${filename}`,
+                            name: filename.replace(/^[^_]+_/, '').replace(/\.[^/.]+$/, '')
+                        }));
+                    }
+                });
+            });
+            
+            return processed;
+        }
+
+        async function scanPartsFromCSV() {
+            const categories = ['head', 'eyes', 'chest', 'arms', 'hand', 'foot'];
+            
+            for (const category of categories) {
+                for (const type of ['film', 'ai']) {
+                    const baseDir = type === 'film' ? 'parti_estratte_film' : 'parti_estratte_ai';
+                    const parts = [];
+                    
+                    // Try all CSV filenames
+                    for (const data of csvData) {
+                        if (!data.file) continue;
+                        const baseName = data.file.replace(/\.[^/.]+$/, "");
+                        
+                        for (const ext of ['jpg', 'png', 'jpeg']) {
+                            const path = `assets/image/${baseDir}/${category}/${category}_${baseName}.${ext}`;
+                            if (await imageExists(path)) {
+                                parts.push({ path, name: baseName });
+                                break;
+                            }
+                        }
+                    }
+                    
+                    anatomicalParts[type][category] = parts;
+                }
+            }
+        }
+
+        function renderAnatomicalBody(type) {
+            const container = document.getElementById(`${type}Anatomical`);
+            container.innerHTML = '';
+            
+            // Create anatomical structure
+            const structure = document.createElement('div');
+            structure.className = 'anatomical-structure';
+            
+            // Define zones with their positions
+            const zones = [
+                { key: 'head', label: 'HEAD', className: 'zone-head' },
+                { key: 'chest', label: 'CHEST', className: 'zone-chest' },
+                { key: 'arms', label: 'ARM L', className: 'zone-arms-left', side: 'left' },
+                { key: 'arms', label: 'ARM R', className: 'zone-arms-right', side: 'right' },
+                { key: 'hand', label: 'HAND L', className: 'zone-hand-left', side: 'left' },
+                { key: 'hand', label: 'HAND R', className: 'zone-hand-right', side: 'right' },
+                { key: 'foot', label: 'FOOT L', className: 'zone-foot-left', side: 'left' },
+                { key: 'foot', label: 'FOOT R', className: 'zone-foot-right', side: 'right' }
+            ];
+            
+            zones.forEach(zone => {
+                const parts = anatomicalParts[type][zone.key] || [];
+                
+                // For arms, hands, and feet: split parts between left and right
+                let zoneParts = parts;
+                if (zone.side) {
+                    const halfIndex = Math.ceil(parts.length / 2);
+                    zoneParts = zone.side === 'left' ? parts.slice(0, halfIndex) : parts.slice(halfIndex);
+                }
+                
+                const zoneDiv = document.createElement('div');
+                zoneDiv.className = `anatomy-zone ${zone.className}`;
+                
+                const label = document.createElement('div');
+                label.className = 'zone-label';
+                label.textContent = zone.label;
+                zoneDiv.appendChild(label);
+                
+                if (zoneParts.length > 0) {
+                    const count = document.createElement('div');
+                    count.className = 'zone-count';
+                    count.textContent = zoneParts.length;
+                    zoneDiv.appendChild(count);
+                    
+                    // Create stack container for overlapping
+                    const stack = document.createElement('div');
+                    stack.className = 'zone-stack';
+                    
+                    zoneParts.forEach((part, index) => {
+                        const img = document.createElement('div');
+                        img.className = 'anatomy-part-img';
+                        img.style.backgroundImage = `url('${part.path}')`;
+                        img.title = part.name;
+                        
+                        // Create overlapping effect with random offset and rotation
+                        const maxOffset = 25; // increased for smaller images
+                        const offsetX = (Math.random() - 0.5) * maxOffset;
+                        const offsetY = (Math.random() - 0.5) * maxOffset;
+                        const rotation = (Math.random() - 0.5) * 25; // degrees
+                        const scale = 0.9 + (Math.random() * 0.4); // 0.9 to 1.3
+                        
+                        // Position randomly within zone
+                        const randomLeft = 25 + (Math.random() * 50); // 25-75%
+                        const randomTop = 25 + (Math.random() * 50); // 25-75%
+                        
+                        img.style.left = randomLeft + '%';
+                        img.style.top = randomTop + '%';
+                        img.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg) scale(${scale})`;
+                        img.style.zIndex = index;
+                        
+                        // Vary opacity slightly based on position in stack
+                        const baseOpacity = 0.65;
+                        const opacityVariation = 0.25;
+                        img.style.opacity = baseOpacity + (Math.random() * opacityVariation);
+                        
+                        stack.appendChild(img);
+                    });
+                    
+                    zoneDiv.appendChild(stack);
+                }
+                
+                structure.appendChild(zoneDiv);
+            });
+            
+            container.appendChild(structure);
+        }
+
+        // Initialize
+        let partsLibrary = {
+            film: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] },
+            ai: { head: [], eyes: [], chest: [], arms: [], hand: [], foot: [] }
+        };
+
+        let placedParts = {
+            film: [],
+            ai: []
+        };
+
+        let selectedPart = null;
+        let draggedPart = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        // Initialize composition mode
+        function initCompositionMode() {
+            if (partsLibrary.film.head.length === 0) {
+                loadBodyParts();
+            }
+        }
+
+        // Load all body parts from directories
+        async function loadBodyParts() {
+            const categories = ['head', 'eyes', 'chest', 'arms', 'hand', 'foot'];
+            const worlds = ['film', 'ai'];
+
+            for (const world of worlds) {
+                const baseDir = world === 'film' ? 'parti_estratte_film' : 'parti_estratte_ai';
+                
+                for (const category of categories) {
+                    try {
+                        // Try to load a predefined list of images
+                        // Since we can't list directory contents via fetch, we'll try common patterns
+                        const images = await tryLoadImages(baseDir, category);
+                        partsLibrary[world][category] = images;
+                    } catch (error) {
+                        console.error(`Error loading ${world}/${category}:`, error);
+                    }
+                }
+            }
+
+            // Load initial category
+            loadPaletteCategory('head', 'film');
+            loadPaletteCategory('head', 'ai');
+            
+            console.log('Parts library loaded:', partsLibrary);
+        }
+
+        // Try to load images from a category using CSV file names
+        async function tryLoadImages(baseDir, category) {
+            const images = [];
+            
+            // Use CSV data to generate potential filenames
+            for (const data of csvData) {
+                if (!data.file) continue;
+                
+                // Extract base name without extension
+                const baseName = data.file.replace(/\.[^/.]+$/, "");
+                
+                // Try with category prefix: category_basename.jpg
+                const pathJpg = `assets/image/${baseDir}/${category}/${category}_${baseName}.jpg`;
+                const pathPng = `assets/image/${baseDir}/${category}/${category}_${baseName}.png`;
+                
+                if (await imageExists(pathJpg)) {
+                    images.push({
+                        path: pathJpg,
+                        name: baseName
+                    });
+                } else if (await imageExists(pathPng)) {
+                    images.push({
+                        path: pathPng,
+                        name: baseName
+                    });
+                }
+            }
+            
+            // Also try numbered pattern as fallback: category_1.jpg, category_2.jpg, etc.
+            if (images.length === 0) {
+                for (let i = 1; i <= 50; i++) {
+                    const pathJpg = `assets/image/${baseDir}/${category}/${category}_${i}.jpg`;
+                    const pathPng = `assets/image/${baseDir}/${category}/${category}_${i}.png`;
+                    
+                    if (await imageExists(pathJpg)) {
+                        images.push({
+                            path: pathJpg,
+                            name: `${i}`
+                        });
+                    } else if (await imageExists(pathPng)) {
+                        images.push({
+                            path: pathPng,
+                            name: `${i}`
+                        });
+                    } else {
+                        break; // Stop when image doesn't exist
+                    }
+                }
+            }
+
+            return images;
+        }
+
+        // Check if image exists
+        function imageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        // Load palette category
+        function loadPaletteCategory(category, world) {
+            const paletteContent = document.getElementById(`paletteContent${world === 'film' ? 'Film' : 'AI'}`);
+            paletteContent.innerHTML = '';
+
+            const parts = partsLibrary[world][category];
+            
+            if (parts.length === 0) {
+                paletteContent.innerHTML = '<div style="color: rgba(255,255,255,0.5); padding: 20px; text-align: center;">No parts found</div>';
+                return;
+            }
+            
+            // Add count indicator
+            const countDiv = document.createElement('div');
+            countDiv.style.cssText = 'color: rgba(255,255,255,0.7); padding: 10px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;';
+            countDiv.textContent = `${parts.length} part${parts.length !== 1 ? 's' : ''} available`;
+            paletteContent.appendChild(countDiv);
+
+            parts.forEach((part, index) => {
+                const partItem = document.createElement('div');
+                partItem.className = 'part-item';
+                partItem.style.backgroundImage = `url('${part.path}')`;
+                partItem.dataset.path = part.path;
+                partItem.dataset.category = category;
+                partItem.dataset.world = world;
+                partItem.title = part.name;
+
+                partItem.addEventListener('click', () => {
+                    addPartToCanvas(part.path, category, world);
+                });
+
+                paletteContent.appendChild(partItem);
+            });
+        }
+
+        // Palette tab switching
+        document.querySelectorAll('.palette-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const category = this.dataset.category;
+                const world = this.dataset.world;
+                
+                // Update active tab
+                this.parentElement.querySelectorAll('.palette-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Load category
+                loadPaletteCategory(category, world);
+            });
+        });
+
+        // Add part to canvas
+        function addPartToCanvas(partPath, category, world) {
+            const canvas = document.getElementById(`canvas${world === 'film' ? 'Film' : 'AI'}`);
+            
+            const part = document.createElement('div');
+            part.className = 'placed-part';
+            part.style.backgroundImage = `url('${partPath}')`;
+            part.dataset.path = partPath;
+            part.dataset.category = category;
+            
+            // Default size based on category
+            const sizes = {
+                head: { width: 120, height: 120 },
+                eyes: { width: 80, height: 40 },
+                chest: { width: 100, height: 120 },
+                arms: { width: 60, height: 100 },
+                hand: { width: 50, height: 50 },
+                foot: { width: 60, height: 40 }
+            };
+            
+            const size = sizes[category] || { width: 100, height: 100 };
+            part.style.width = size.width + 'px';
+            part.style.height = size.height + 'px';
+            
+            // Default position (center)
+            part.style.left = (200 - size.width / 2) + 'px';
+            part.style.top = (250 - size.height / 2) + 'px';
+            
+            // Controls
+            const controls = document.createElement('div');
+            controls.className = 'part-controls';
+            controls.innerHTML = `
+                <button class="part-control-btn" onclick="rotatePart(this)">↻</button>
+                <button class="part-control-btn" onclick="resizePart(this, 1.2)">+</button>
+                <button class="part-control-btn" onclick="resizePart(this, 0.8)">−</button>
+                <button class="part-control-btn" onclick="deletePart(this)">✕</button>
+            `;
+            part.appendChild(controls);
+            
+            // Drag functionality
+            part.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('part-control-btn')) return;
+                
+                draggedPart = part;
+                const rect = part.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                part.classList.add('selected');
+                selectedPart = part;
+            });
+            
+            canvas.appendChild(part);
+            placedParts[world].push(part);
+        }
+
+        // Global drag handlers
+        document.addEventListener('mousemove', (e) => {
+            if (!draggedPart) return;
+            
+            const canvas = draggedPart.parentElement;
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            let x = e.clientX - canvasRect.left - dragOffset.x;
+            let y = e.clientY - canvasRect.top - dragOffset.y;
+            
+            // Keep within bounds
+            x = Math.max(0, Math.min(x, canvasRect.width - draggedPart.offsetWidth));
+            y = Math.max(0, Math.min(y, canvasRect.height - draggedPart.offsetHeight));
+            
+            draggedPart.style.left = x + 'px';
+            draggedPart.style.top = y + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (draggedPart) {
+                draggedPart.classList.remove('selected');
+            }
+            draggedPart = null;
+        });
+
+        // Part controls
+        window.rotatePart = function(btn) {
+            const part = btn.closest('.placed-part');
+            const currentRotation = part.dataset.rotation || 0;
+            const newRotation = (parseInt(currentRotation) + 45) % 360;
+            part.style.transform = `rotate(${newRotation}deg)`;
+            part.dataset.rotation = newRotation;
+        };
+
+        window.resizePart = function(btn, scale) {
+            const part = btn.closest('.placed-part');
+            const currentWidth = part.offsetWidth;
+            const currentHeight = part.offsetHeight;
+            part.style.width = (currentWidth * scale) + 'px';
+            part.style.height = (currentHeight * scale) + 'px';
+        };
+
+        window.deletePart = function(btn) {
+            const part = btn.closest('.placed-part');
+            const world = part.closest('.composition-world').id.includes('Film') ? 'film' : 'ai';
+            const index = placedParts[world].indexOf(part);
+            if (index > -1) {
+                placedParts[world].splice(index, 1);
+            }
+            part.remove();
+        };
+
+        // Clear all button
+        document.getElementById('clearFilm').addEventListener('click', () => {
+            document.getElementById('canvasFilm').innerHTML = '';
+            placedParts.film = [];
+        });
+
+        document.getElementById('clearAI').addEventListener('click', () => {
+            document.getElementById('canvasAI').innerHTML = '';
+            placedParts.ai = [];
+        });
+
+        // Export functionality (placeholder)
+        document.getElementById('exportFilm').addEventListener('click', () => {
+            alert('Export Film composition (to be implemented)');
+        });
+
+        document.getElementById('exportAI').addEventListener('click', () => {
+            alert('Export AI composition (to be implemented)');
         });
 
         // Initialize
         loadCSV();
     </script>
 </body>
-</html>
+</html>x
